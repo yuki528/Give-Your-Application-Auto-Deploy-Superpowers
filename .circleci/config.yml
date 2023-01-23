@@ -12,7 +12,6 @@ commands:
           command: |
             # Your code here
             exit 1
-
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
@@ -44,6 +43,10 @@ jobs:
           name: Build front-end
           command: |
             # Your code here
+            cd frontend
+            npm install
+            npm run build
+
             exit 1
       - save_cache:
           paths: [frontend/node_modules]
@@ -60,6 +63,9 @@ jobs:
           name: Back-end build
           command: |
              # Your code here
+             cd backend
+             npm install
+             npm run build
              exit 1
       - save_cache:
           paths: [backend/node_modules]
@@ -68,6 +74,7 @@ jobs:
   test-frontend:
     docker:
       # Docker image here
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       # Restore from cache
@@ -76,6 +83,7 @@ jobs:
   test-backend:
     docker:
       # Docker image here
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       # Restore from cache
@@ -84,6 +92,7 @@ jobs:
   scan-frontend:
     docker:
       # Docker image here
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       # Restore from cache
@@ -92,6 +101,7 @@ jobs:
   scan-backend:
     docker:
       # Docker image here
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       # Restore from cache
@@ -100,6 +110,7 @@ jobs:
   deploy-infrastructure:
     docker:
       # Docker image here that supports AWS CLI
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       - run:
@@ -134,6 +145,7 @@ jobs:
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       # Add ssh keys with fingerprint
@@ -153,6 +165,7 @@ jobs:
   run-migrations:
     docker:
       # Docker image here that supports NodeJS
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       - run:
@@ -170,6 +183,7 @@ jobs:
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       - run:
@@ -191,6 +205,7 @@ jobs:
   deploy-backend:
     docker:
       # Docker image here that supports Ansible
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       # Add ssh keys with fingerprint
@@ -208,6 +223,7 @@ jobs:
   smoke-test:
     docker:
       # Lightweight Docker image 
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       - run:
@@ -231,6 +247,7 @@ jobs:
   cloudfront-update:
     docker:
       # Docker image here that supports AWS CLI
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       - run:
@@ -246,6 +263,7 @@ jobs:
 cleanup:
     docker:
       # Docker image here
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       - run:
@@ -262,7 +280,6 @@ cleanup:
               # your code here
             fi
             
-
 workflows:
   default:
     jobs:
