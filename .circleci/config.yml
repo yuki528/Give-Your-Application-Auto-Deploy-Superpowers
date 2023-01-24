@@ -105,6 +105,7 @@ jobs:
           name: Test backend
           command: |
              cd ./backend
+             npm install
              npm run test
             
   scan-frontend:
@@ -123,6 +124,8 @@ jobs:
           name: Scan frontend
           command: |
              cd ./frontend
+             npm install
+             npm audit --audit-level=critical
              npm audit fix --audit-level=critical --force
 
   scan-backend:
@@ -140,6 +143,8 @@ jobs:
           name: Scan backend
           command: |
               cd ./backend
+              npm install
+              npm audit --audit-level=critical
               npm audit fix --audit-level=critical --force
 
 
