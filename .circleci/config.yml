@@ -3,10 +3,6 @@ version: 2.1
 orbs:
   slack: circleci/slack@4.12.1
 
-parameters:
-  workflow_id:
-    type: string
-    default: '${CIRCLE_WORKFLOW_ID}'
 
 commands:
   create-dotenv-file:
@@ -34,7 +30,7 @@ commands:
         type: string  
     steps:
       - run:
-          name: Echo workflow ID that is going be be destroyed
+          name: Echo workflow ID that
           when: on_fail
           command: echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:7}"
       - run :
@@ -42,9 +38,9 @@ commands:
            when: on_fail
            command: |
             # Your code here
-            aws s3 rm s3://udapeople-<< parameters.workflow_id >> --recursive
-            aws s3 rb s3://udapeople-<< parameters.workflow_id >> --force
-            aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.workflow_id >>
+            aws s3 rm s3://udapeople-<< parameters.workflowID >> --recursive
+            aws s3 rb s3://udapeople-<< parameters.workflowID >> --force
+            aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.workflowID >>
       - run:
           name: Destroy frontend stack
           when: on_fail
@@ -53,8 +49,10 @@ commands:
             
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
-   # parameters:
-      # Add parameter here     
+    parameters:
+      # Add parameter here 
+      workflowID:
+        type: string          
     steps:
       - run:
           name: Revert migrations
@@ -277,7 +275,7 @@ jobs:
 
 # Here's where you will add some code to rollback on failure
       - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}    
+          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}    
 
   run-migrations:
     docker:
@@ -317,7 +315,7 @@ jobs:
       
       # Here's where you will add some code to rollback on failure
       - destroy-environment: 
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
            
 
   deploy-frontend:
@@ -356,9 +354,9 @@ jobs:
       # Here's where you will add some code to rollback on failure      
     
       - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
   deploy-backend:
     docker:
       # Docker image here that supports Ansible
@@ -398,7 +396,7 @@ jobs:
       - destroy-environment:
           workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7 
+          workflowID: ${CIRCLE_WORKFLOW_ID:0:7 
 
   smoke-test:
     docker:
