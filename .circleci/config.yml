@@ -249,8 +249,8 @@ jobs:
              - project/backend
 
 # Here's where you will add some code to rollback on failure
-      - destroy-environment:
-          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}    
+   #   - destroy-environment:
+    #      workflowID: ${CIRCLE_WORKFLOW_ID:0:7}    
 
   run-migrations:
     docker:
