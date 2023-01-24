@@ -3,11 +3,6 @@ version: 2.1
 orbs:
   slack: circleci/slack@4.12.1
 
-parameters:
-  workflow_id:
-    type: string
-    default: '${CIRCLE_WORKFLOW_ID}'
-
 commands:
   create-dotenv-file:
     description: Create .env file
