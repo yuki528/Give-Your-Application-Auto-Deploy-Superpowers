@@ -229,6 +229,8 @@ jobs:
           command: |
             # Your code here
             apk add --update --no-cache tar gzip ansible aws-cli
+      
+      - create-dotenv-file
             
       - run:
           name: Configure server
@@ -236,11 +238,18 @@ jobs:
             # Your code here
             pwd
             cd .circleci/ansible
-            ansible-playbook -i inventory.txt configure-server.yml \
-           # cat ./.circleci/ansible/inventory.txt
-           # export ANSIBLE_HOST_KEY_CHECKING=false
-           # ansible-playbook -i ./.circleci/ansible/inventory.txt ./.circleci/ansible/configure-server.yml
-      # Here's where you will add some code to rollback on failure  
+          
+            cat ./.circleci/ansible/inventory.txt
+            export ANSIBLE_HOST_KEY_CHECKING=false
+            ansible-playbook -i ./.circleci/ansible/inventory.txt ./.circleci/ansible/configure-server.yml
+       
+
+      - persist_to_workspace:
+           root: ~/
+           paths:
+             - project/backend
+             
+# Here's where you will add some code to rollback on failure
       - destroy-environment:
           workflowID: ${CIRCLE_WORKFLOW_ID:0:7}    
 
