@@ -278,8 +278,8 @@ jobs:
              - project/backend
 
 # Here's where you will add some code to rollback on failure
-      - destroy-environment:
-          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}    
+   #   - destroy-environment:
+    #      workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}    
 
   run-migrations:
     docker:
@@ -318,8 +318,8 @@ jobs:
             fi
       
       # Here's where you will add some code to rollback on failure
-      - destroy-environment: 
-          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
+    #  - destroy-environment: 
+       #   workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
            
 
   deploy-frontend:
@@ -357,10 +357,10 @@ jobs:
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       # Here's where you will add some code to rollback on failure      
     
-      - destroy-environment:
-          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert-migrations:
-          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
+   #   - destroy-environment:
+   #       workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
+    #  - revert-migrations:
+    #      workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
   deploy-backend:
     docker:
       # Docker image here that supports Ansible
@@ -397,10 +397,10 @@ jobs:
 
 
       # Here's where you will add some code to rollback on failure 
-      - destroy-environment:
-          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert-migrations:
-          workflowID: ${CIRCLE_WORKFLOW_ID:0:7 
+     # - destroy-environment:
+       #   workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
+     # - revert-migrations:
+     #     workflowID: ${CIRCLE_WORKFLOW_ID:0:7 
 
   smoke-test:
     docker:
