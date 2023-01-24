@@ -162,53 +162,53 @@ jobs:
       #- image: circleci/node:13.8.0
     #steps:
       # Checkout code from git
-      - run:
-          name: Ensure back-end infrastructure exists
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/backend.yml \
+    #  - run:
+      #    name: Ensure back-end infrastructure exists
+     #     command: |
+     #       aws cloudformation deploy \
+      #        --template-file .circleci/files/backend.yml \
               #--tags project=your-tag \
               # --stack-name "your back-end stack name with workflow id" \
               # --parameter-overrides ID="your workflow id"  
-              exit 1
-      - run:
-          name: Ensure front-end infrastructure exist
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/frontend.yml \
+       #       exit 1
+    #  - run:
+     #     name: Ensure front-end infrastructure exist
+     #     command: |
+     #       aws cloudformation deploy \
+      #        --template-file .circleci/files/frontend.yml \
               #--tags project=your-tag \
               # --stack-name "your front-end stack name with workflow id" \
               # --parameter-overrides ID="your workflow id"  
-              exit 1
-      - run:
-          name: Add back-end ip to ansible inventory
-          command: |
+      #        exit 1
+    #  - run:
+     #     name: Add back-end ip to ansible inventory
+    #      command: |
             # Your code here
-            exit 1
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/.circleci/ansible/inventory.txt
+     #       exit 1
+     # - persist_to_workspace:
+      #    root: ~/
+     #     paths:
+     #       - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure      
 
-  configure-infrastructure:
-    docker:
+  #configure-infrastructure:
+   # docker:
       # Docker image here that supports Ansible
-      - image: circleci/node:13.8.0
-    steps:
+    #  - image: circleci/node:13.8.0
+   # steps:
       # Checkout code from git
       # Add ssh keys with fingerprint
       # attach workspace
-      - run:
-          name: Install dependencies
-          command: |
+     # - run:
+      #    name: Install dependencies
+       #   command: |
             # Your code here
-            exit 1
-      - run:
-          name: Configure server
-          command: |
+       #     exit 1
+     # - run:
+     #     name: Configure server
+      #    command: |
             # Your code here
-            exit 1
+      #      exit 1
       # Here's where you will add some code to rollback on failure      
 
   run-migrations:
