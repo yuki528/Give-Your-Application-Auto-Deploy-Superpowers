@@ -235,13 +235,8 @@ jobs:
           name: Configure server
           command: |
             # Your code here
-            pwd
             cd .circleci/ansible
-          
-            cat ./.circleci/ansible/inventory.txt
-            export ANSIBLE_HOST_KEY_CHECKING=false
             ansible-playbook -i inventory.txt configure-server.yml
-       
 
       - persist_to_workspace:
            root: ~/
