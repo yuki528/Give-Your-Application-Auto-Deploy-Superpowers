@@ -265,7 +265,11 @@ jobs:
           name: Install dependencies
           command: |
             # Your code here
-            apk add --update --no-cache tar gzip ansible aws-cli
+            apk add curl
+            apk add --upgrade bash
+            apk add --update ansible
+            apk add openssh-client
+            pip3 install awscli
 
       - run:
           name: Configure server
@@ -425,6 +429,9 @@ jobs:
       # Checkout code from git
       - checkout 
 
+      - attach_workspace:
+          at: /root
+
       - run:
           name: Install dependencies
           command: |
@@ -434,10 +441,6 @@ jobs:
       - attach_workspace:
           at: /root
 
-      - run:
-          name: Get backend url
-          command: |
-            # your code here
       - run:
           name: Backend smoke test.
           command: |
@@ -463,7 +466,7 @@ jobs:
             if curl -s $FRONTEND_WEBSITE | grep "Welcome"
             then
               # This is the intentional error, if "Welcome" is indeed in the response this step will exit with exit code 1
-              exit 0
+              exit 1
             else
               exit 1
             fi
