@@ -497,7 +497,9 @@ jobs:
           command: |
             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
             then
-              # your code here
+              exit 0
+            else 
+               exit 1
             fi
             
 workflows:
