@@ -370,6 +370,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints: ["19:39:36:32:56:55:f4:c2:cc:6c:dd:cc:56:48:ba:44 "]
+
       - attach_workspace:
           at: ~/
       - run:
