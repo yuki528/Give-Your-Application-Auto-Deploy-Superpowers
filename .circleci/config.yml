@@ -256,7 +256,7 @@ jobs:
       # Add ssh keys with fingerprint
       - add_ssh_keys:
           fingerprints:
-            - "d2:f5:3c:5a:b8:50:b1:e1:ea:a2:4c:9a:27:9f:d3:0b"
+            - "19:39:36:32:56:55:f4:c2:cc:6c:dd:cc:56:48:ba:44"
       # attach workspace
       - attach_workspace:
           at:  ~/
@@ -287,7 +287,7 @@ jobs:
   run-migrations:
     docker:
       # Docker image here that supports NodeJS
-      - image: python:3.10-alpine3.16
+      - image: python:3.10-alpine63.1
     steps:
       # Checkout code from git
       - checkout 
@@ -364,7 +364,7 @@ jobs:
             npm install
             npm run build
             ls -l
-            ws s3 cp ./dist "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
+            aws s3 cp ./dist "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
       # Here's where you will add some code to rollback on failure      
     
       - destroy-environment:
@@ -392,7 +392,7 @@ jobs:
       # Add ssh keys with fingerprint
       - add_ssh_keys:
            fingerprints:
-             - 'd2:f5:3c:5a:b8:50:b1:e1:ea:a2:4c:9a:27:9f:d3:0b'
+             - '19:39:36:32:56:55:f4:c2:cc:6c:dd:cc:56:48:ba:44'
       # attach workspace
       - attach_workspace:
           at: /root
