@@ -79,7 +79,7 @@ jobs:
              npm install
              npm run build
              #cp .env dist/.env
-             pwd && ls -al
+             #pwd && ls -al
 
       - persist_to_workspace:
           root: ~/
@@ -336,9 +336,10 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
-
+      - attach_workspace:
+          at: ~/
       - run:
-          name: Install dependencies
+          name: Install deps
           command: |
             apk add --update --no-cache tar gzip nodejs npm ansible curl aws-cli
       - run:
@@ -364,6 +365,7 @@ jobs:
             npm install
             npm run build
             ls -l
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp ./dist "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
       # Here's where you will add some code to rollback on failure      
     
@@ -395,11 +397,11 @@ jobs:
              - '19:39:36:32:56:55:f4:c2:cc:6c:dd:cc:56:48:ba:44'
       # attach workspace
       - attach_workspace:
-          at: /root
+          at: ~/
       - run:
           name: Install dependencies
           command: |
-            # your code here
+            apk add --update --no-cache tar gzip nodejs npm tree aws-cli ansible
             apk add --update ansible rsync 
             apk add curl
             pip3 install awscli
@@ -409,11 +411,18 @@ jobs:
           name: Deploy backend
           command: |
             # your code here
-            ls /root
-            ls /root/project/backend/
-            cat ~/project/.circleci/ansible/inventory.txt
-            ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
-
+            cd backend
+            npm install
+            npm run build
+            cd ..
+            tar -C backend -czvf artifact.tar.gz .
+            tree -afC /root/project/.circleci -I *node_modules*
+            mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
+            mv artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz
+            cd .circleci/ansible
+            echo "Contents of the inventory.txt file is ------$(tail -1 inventory.txt)"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml \
 
       # Here's where you will add some code to rollback on failure 
       - destroy-environment:
