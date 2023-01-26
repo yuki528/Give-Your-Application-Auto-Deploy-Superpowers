@@ -282,10 +282,10 @@ jobs:
           name: Run migrations
           command: |
             cd backend
-            npm run migrations > migration_status
+            npm install
+            npm run migrations > migration_status.txt
       - run:
           name: Send migration results to memstash
-          working_directory: ./backend
           command: |
             echo "has been done successfully" > ./migration_status.txt
             pwd && ls -al
