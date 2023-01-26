@@ -1,5 +1,16 @@
 version: 2.1 
 
+executors:
+  node:
+    docker:
+      - image: circleci/node:13.8.0
+  python:
+    docker:
+      - image: python:3.9.0-alpine
+  aws:
+    docker:
+      - image: amazon/aws-cli
+
 commands:
   install_awscli:
     description: Install aws cli v2
@@ -118,50 +129,32 @@ commands:
                 npm run migration:revert
               fi          
 
-jobs:
   build-frontend:
-    docker:
-#- image: circleci/node:13.8.0
-      - image: cimg/node:13.8.0
+    executor: node
     steps:
       - checkout
-      - restore_cache:
-          key: frontend-deps-{{ checksum "frontend/package-lock.json" }}
+      - attach_workspace:
+          at: .
       - run:
-          ### name: Build front-end
-          # command: |
-          #   # Your code here
-          #   exit 1
-          
-          name: Build front-end
-          command: |
-            cd frontend
-            npm install 
-            npm run build
-      - save_cache:
-          paths: [frontend/node_modules]
-          key: frontend-deps-{{ checksum "frontend/package-lock.json" }}
+          name: npm run build
+          working_directory: ./frontend
+          command: npm run build
 
 
   build-backend:
-    docker:
-      - image: cimg/node:13.8.0
+    executor: node
     steps:
       - checkout
-      - restore_cache:
-          key: backend-deps-{{ checksum "backend/package-lock.json" }}
+      - attach_workspace:
+          at: .
       - run:
-          name: Back-end build
-          command: |
-            cd backend 
-            # sudo npm install -g typescript
-            # npm i ts-node typescript
-            npm install
-            npm run build
-      ##- install_nodemodules      
-      - save_cache:
-          paths: [backend/node_modules]
-          key: backend-deps-{{ checksum "backend/package-lock.json" }}
+          name: npm run build
+          working_directory: ./backend
+          command: npm run build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - backend/dist
 
   test-frontend:
     docker:
@@ -394,6 +387,10 @@ jobs:
                 cd frontend
                 npm run build
                 aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - persist_to_workspace:
+          root: .
+          paths:
+            - frontend/dist
       # - destroy-environment
       # - revert-migrations
 
@@ -403,29 +400,27 @@ jobs:
       - image: cimg/python:3.10
     steps:
       - checkout
-      #- install_awscli
-      #- install_nodejs
-      #- install_ansible
+      - install_awscli
+      - install_nodejs
+      - install_ansible
       - add_ssh_keys:
           fingerprints: ["19:39:36:32:56:55:f4:c2:cc:6c:dd:cc:56:48:ba:44"]
       - attach_workspace:
-          at: /root
-      
+          at: .
       - run:
           name: Install dependencies
+          working_directory: /tmp
           command: |
-            apk add --update ansible rsync 
-            apk add curl
-            pip3 install awscli
+            apk add --update ansible curl rsync openssh nodejs npm
+            ansible --version
+            pip install awscli
+            aws --version
       - run:
           name: Deploy backend
+          working_directory: ./.circleci/ansible
           command: |
-            ls /root
-            ls /root/project/backend/
-            cat ~/project/.circleci/ansible/inventory.txt
-            ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
-      - destroy-environment
-      - revert-migrations
+            cat inventory
+            ansible-playbook -i inventory deploy-backend.yml -vv
 
   smoke-test:
     docker:
