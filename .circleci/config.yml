@@ -364,13 +364,13 @@ jobs:
           fingerprints:
             - "19:39:36:32:56:55:f4:c2:cc:6c:dd:cc:56:48:ba:44"
       - attach_workspace:
-          at: ~/
+          at: .
       - run:
           name: Install dependencies
           working_directory: /tmp
           command: |
             apk add --update ansible curl rsync openssh nodejs npm
-            apt install -y rsync
+            apk install  rsync
             ansible --version
             pip install awscli
             aws --version
@@ -393,7 +393,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/
+          at: .
       - run:
           name: Install dependencies
           working_directory: /tmp
