@@ -488,24 +488,20 @@ workflows:
 
       ## INFRASTRUCTURE
       - deploy-infrastructure:
-          #filters:
-           # branches:
+           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+           #filters:
+            #branches:
              # only:
-             #   - main
+                #- main
       - configure-infrastructure:
           requires:
             - deploy-infrastructure
       - run-migrations:
-          requires:
-            - test-backend
-            - test-frontend
-            - scan-backend
-            - scan-frontend
-            - configure-infrastructure
-          filters:
-            branches:
-              only:
-                - master
+          requires: [configure-infrastructure]
+          #filters:
+           # branches:
+             # only:
+              #  - master
       - deploy-backend:
           requires:
             - run-migrations
