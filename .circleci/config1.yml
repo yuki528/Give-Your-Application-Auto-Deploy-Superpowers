@@ -50,7 +50,7 @@ commands:
           name: Revert migrations
           working_directory: ./backend
           command: |
-            SUCCESS=$(curl -H "token: 2a9e15d6-b9fa-4b1f-a5dc-e3b9643a9b63" --request GET https://api.memstash.io/values/DB_MIGRATION_<< parameters.id >>)
+            SUCCESS=$(curl --insecure  https://kvdb.io/${KVDB_BUCKET}/migration_<< parameters.Workflow_ID >>)
             echo $SUCCESS
             if [[ "$SUCCESS" == "success" ]]
             then
@@ -258,7 +258,7 @@ jobs:
             pwd &&
             ls -la
             cat inventory
-            ansible-playbook -i inventory configure-server.yaml
+            ansible-playbook -i inventory configure-server.yml
       - destroy_environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
@@ -364,7 +364,7 @@ jobs:
           working_directory: ./.circleci/ansible
           command: |
             cat inventory
-            ansible-playbook -i inventory deploy-server.yaml -vv
+            ansible-playbook -i inventory deploy-backend.yml -vv
       - destroy_environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
