@@ -219,7 +219,7 @@ jobs:
             curl https://kvdb.io/GRkThmKJMbL9eTWpBLPotj/backend_url  -d "${API_URL}"
 
       - persist_to_workspace:
-          root: ~/
+          root: .
           paths:
             - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure      
@@ -341,7 +341,7 @@ jobs:
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             echo "API_URL=http://${BACKEND_IP}:3030" >> frontend/.env
-            cat frontend/.env
+            #cat frontend/.env
             
       - run:
           name: Deploy frontend objects
@@ -367,7 +367,7 @@ jobs:
           fingerprints: ["19:39:36:32:56:55:f4:c2:cc:6c:dd:cc:56:48:ba:44"]
 
       - attach_workspace:
-          at: ~/
+          at: .
       - run:
           name: Install dependencies
           command: |
@@ -382,7 +382,7 @@ jobs:
               cd ..
               # Zip the directory
               tar -C backend -czvf artifact.tar.gz .
-              cd .circleci/ansible
+              cd ././circleci/ansible
               echo "Contents  of the inventory.txt file is -------"
               cat inventory.txt
               ansible-playbook -i inventory.txt deploy-backend.yml 
@@ -411,7 +411,7 @@ jobs:
             apk add --update --no-cache curl aws-cli tar gzip nodejs npm
 
       - attach_workspace:
-          at: /root
+          at: .
 
       - run:
           name: Backend smoke test.
