@@ -398,6 +398,25 @@ jobs:
       # - revert-migrations
 
 #######-----------------###################
+  deploy-backend:
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+      - install_awscli
+      - install_nodejs
+      - install_ansible
+      - add_ssh_keys:
+          fingerprints: ["19:39:36:32:56:55:f4:c2:cc:6c:dd:cc:56:48:ba:44"]
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          key: backend-deps-{{ checksum "backend/package-lock.json" }}
+      - run:
+          name: Install dependencies
+          command: |
+            cd backend
+            npm install
       - run:
           name: Deploy backend
           command: |
