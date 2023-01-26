@@ -334,19 +334,18 @@ jobs:
           name: Rebuild frontend with backend API Url
           working_directory: ./frontend
           command: |
-            export API_URL=$(aws ec2 describe-instances \
+            BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=backend-<IDENTIFIER>" \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --filter Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} \
-            --output text 
-            )
-            echo "${API_URL}"
+            --output text)
+            export API_URL=http://$BACKEND_PUBLIC_IP:3030
       - run:
           name: Deploy frontend objects to S3
           working_directory: ./frontend
           command: |
             npm install
             npm run build
-            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            # tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp ./dist "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
       - persist_to_workspace:
           root: .
@@ -365,10 +364,11 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints:
-            - "19:39:36:32:56:55:f4:c2:cc:6c:dd:cc:56:48:ba:44"
+          fingerprints: ["19:39:36:32:56:55:f4:c2:cc:6c:dd:cc:56:48:ba:44"]
       - attach_workspace:
           at: .
+      - restore_cache:
+          key: backend-deps-{{ checksum "./backend/package-lock.json" }}
       - run:
           name: Install dependencies
           working_directory: /tmp
@@ -379,10 +379,23 @@ jobs:
             pip install awscli
             aws --version
       - run:
-          name: Deploy backend
-          working_directory: ./.circleci/ansible
+          name: Package Backend
           command: |
+            cd backend
+            npm run build
+            tar -czf artifact.tar.gz dist/* package*
 
+            cd ..
+            cp backend/artifact.tar.gz ./.circleci/ansible/roles/deploy/files
+      - run:
+          name: Deploy backend
+         # working_directory: ./.circleci/ansible
+          command: |
+            export TYPEORM_MIGRATIONS_DIR=./migrations
+            export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
+            export TYPEORM_MIGRATIONS=./migrations/*.ts
+
+            cd ./.circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml -vv
       - destroy_environment:
