@@ -427,8 +427,8 @@ jobs:
             then
               exit 0
             else
-              exit 0
-            fi"
+              exit 1
+            fi
       - run:
           name: Frontend smoke test.
           working_directory: ./backend
