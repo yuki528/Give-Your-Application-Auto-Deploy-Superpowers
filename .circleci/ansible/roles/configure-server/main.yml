@@ -1,36 +1,13 @@
 ---
-- name: "update apt"
-  become: yes
-  apt:
-    update_cache: yes
 
-- name: "upgrade apt packages"
+- name: "add node LTS version and NVM , then using node 13.8.0 version"
   become: true
-  apt:
-    upgrade: "yes"
-
-- name: "install dependencies."
-  become: true
-  apt:
-    name: ["nodejs", "npm"]
-    state: latest
-    update_cache: yes
-
-- name: "install n"
-  become: yes
-  npm:
-    name: n
-    global: yes
-    production: yes
-
-- name: "install nodejs 12.20.1"
-  become: yes
-  shell: n 12.20.1
-
+  shell: |
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+    sudo apt install -y nodejs
+    sudo npm install -g n
+    sudo n 13.8.0
 - name: "install pm2"
-  become: true
   npm:
     name: pm2
     global: yes
-    production: yes
-    state: present
