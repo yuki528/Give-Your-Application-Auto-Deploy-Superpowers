@@ -168,7 +168,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/
+          at: .
       - run:
           name: Check Frontend against security vulnerabilities
           working_directory: ./frontend
@@ -182,7 +182,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/
+          at: .
       - run:
           name: Check Backend against security vulnerabilities
           working_directory: ./backend
@@ -283,7 +283,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/
+          at: .
       - run:
           name: Install AWS CLI dependencies
           working_directory: /tmp
@@ -333,11 +333,16 @@ jobs:
           name: Rebuild frontend with backend API Url
           working_directory: ./frontend
           command: |
-            BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
-              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --output text)
-            echo "API_URL=http://${BACKEND_PUBLIC_IP}:3030" >> frontend/.env
+            export BACKEND_IP=$(aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filter Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} \
+            --output text 
+            )
+            API_URL=$(curl --insecure  https://kvdb.io/GRkThmKJMbL9eTWpBLPotj/backend_url)
+            echo $API_URL
+            echo "${API_URL}"
+            echo "NODE_ENV=production" >> frontend/.env
+            echo "API_URL=${API_URL}" >> frontend/.env
             cat frontend/.env
       - run:
           name: Deploy frontend objects to S3
@@ -345,7 +350,7 @@ jobs:
           command: |
             aws s3 cp ./dist "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
       - persist_to_workspace:
-          root: ~/
+          root: .
           paths:
             - frontend/dist
       - destroy_environment:
@@ -370,7 +375,7 @@ jobs:
           working_directory: /tmp
           command: |
             apk add --update ansible curl rsync openssh nodejs npm
-            apk install  rsync
+            sudo apt-get update && sudo apt-get install -y rysync
             ansible --version
             pip install awscli
             aws --version
