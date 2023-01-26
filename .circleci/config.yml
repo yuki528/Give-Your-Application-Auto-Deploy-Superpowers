@@ -338,8 +338,7 @@ jobs:
             --filter Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} \
             --output text 
             )
-            API_URL=$(curl --insecure  https://kvdb.io/GRkThmKJMbL9eTWpBLPotj/backend_url)
-            echo $API_URL
+            export API_URL=$(curl --insecure  https://kvdb.io/GRkThmKJMbL9eTWpBLPotj/backend_url)
             echo "${API_URL}"
       - run:
           name: Deploy frontend objects to S3
