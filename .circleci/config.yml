@@ -334,12 +334,12 @@ jobs:
           name: Rebuild frontend with backend API Url
           working_directory: ./frontend
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances \
+            export API_URL=$(aws ec2 describe-instances \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
             --filter Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} \
             --output text 
             )
-            echo "API_URL=http://${BACKEND_PUBLIC_IP}:3030"
+            echo "${API_URL}"
       - run:
           name: Deploy frontend objects to S3
           working_directory: ./frontend
@@ -362,17 +362,6 @@ jobs:
 
   deploy-backend:
     executor: python
-    environment:
-          NODE_ENV: "local"
-          VERSION: "1"
-          ENVIRONMENT: "production"
-          TYPEORM_CONNECTION: $TYPEORM_CONNECTION
-          TYPEORM_HOST: $TYPEORM_HOST
-          TYPEORM_USERNAME: $TYPEORM_USERNAME
-          TYPEORM_PASSWORD: $TYPEORM_PASSWORD
-          TYPEORM_DATABASE: $TYPEORM_DATABASE
-          TYPEORM_PORT: $TYPEORM_PORT
-          TYPEORM_ENTITIES: $TYPEORM_ENTITIE
     steps:
       - checkout
       - add_ssh_keys:
@@ -389,15 +378,6 @@ jobs:
             ansible --version
             pip install awscli
             aws --version
-      - run:
-          name: Package Backend
-          command: |
-            cd backend
-            npm run build
-            tar -czf artifact.tar.gz dist/* package*
-
-            cd ..
-            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
       - run:
           name: Deploy backend
           working_directory: ./.circleci/ansible
