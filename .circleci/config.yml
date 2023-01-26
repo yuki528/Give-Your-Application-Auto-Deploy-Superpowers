@@ -124,7 +124,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/
+          at: .
       - run:
           name: Install junit coverage reporter
           working_directory: ./frontend
@@ -146,7 +146,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/
+          at: .
       - run:
           name: Install junit coverage reporter
           working_directory: ./backend
