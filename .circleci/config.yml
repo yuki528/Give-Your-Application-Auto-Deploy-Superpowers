@@ -249,16 +249,14 @@ jobs:
           at: .
       - run:
           name: Install dependencies
-          working_directory: ./.circleci/ansible
           command: |
+            cd .circleci/ansible
             apk add --update ansible
             ansible --version
       - run:
           name: Configure server
-          working_directory: ./.circleci/ansible
           command: |
-            pwd &&
-            ls -la
+            cd .circleci/ansible
             cat inventory
             ansible-playbook -i inventory configure-server.yml
       - destroy_environment:
@@ -282,8 +280,8 @@ jobs:
             sudo ./aws/install
       - run:
           name: Run migrations
-          working_directory: ./backend
           command: |
+            cd backend
             npm run migrations > migration_status
       - run:
           name: Send migration results to memstash
