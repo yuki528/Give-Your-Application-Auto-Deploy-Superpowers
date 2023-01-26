@@ -7,10 +7,11 @@ executors:
       - image: circleci/node:13.8.0
   python:
     docker:
-      - image: python:3.9.0-alpine
+      - image: python:3.10-alpine3.16
   aws:
     docker:
       - image: amazon/aws-cli
+      
 
 
 commands:
@@ -95,7 +96,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/
+          at: .
       - run:
           name: npm run build
           working_directory: ./backend
@@ -111,7 +112,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/
+          at: .
       - run:
           name: npm run build
           working_directory: ./frontend
@@ -278,7 +279,7 @@ jobs:
 
 
   run-migrations:
-    executor: node
+    executor: python
     steps:
       - checkout
       - attach_workspace:
@@ -287,15 +288,14 @@ jobs:
           name: Install AWS CLI dependencies
           working_directory: /tmp
           command: |
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+            apk add --update --no-cache tar gzip nodejs npm aws-cli curl
       - run:
           name: Run migrations
           command: |
             cd backend
-            npm run migrations > migration_status.txt
+            npm install
+            npm run build
+            npm run migrations >> migration_status.txt
             cat migration_status.txt
       - run:
           name: Send migration results to memstash
