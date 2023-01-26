@@ -343,7 +343,7 @@ jobs:
             echo "${API_URL}"
             echo "NODE_ENV=production" >> frontend/.env
             echo "API_URL=${API_URL}" >> frontend/.env
-            cat frontend/.env
+            #cat frontend/.env
       - run:
           name: Deploy frontend objects to S3
           working_directory: ./frontend
