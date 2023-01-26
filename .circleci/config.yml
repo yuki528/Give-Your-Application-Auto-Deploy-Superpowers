@@ -309,7 +309,7 @@ jobs:
             else
               echo "has failed"
               curl --insecure https://kvdb.io/5rTNVEHdZwSn32ApX5E6D5/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '0'
-            fi"
+            fi
       - destroy_environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
