@@ -455,70 +455,71 @@ jobs:
 
 
   cloudfront-update:
-    executor: aws
+    docker:
+      # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli
     steps:
-      - checkout
+      # Checkout code from git
+      - checkout 
+
       - run:
           name: Install dependencies
           command: |
-            yum install -y tar gzip curl
-            curl -sL https://rpm.nodesource.com/setup_10.x | bash -
-            yum install -y nodejs
-      - run:
-          name: Store old WorkflowID in memstash for cleanup phase
-          #working_directory: ./.circleci/files
-          command: |
-            WorkflowID=$(aws cloudformation \
-            list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-            --no-paginate --output text)
-            curl https://kvdb.io/GRkThmKJMbL9eTWpBLPotj/workflowid  -d "${WorkflowID}"
+            # your code here
+            yum install tar gzip npm nodejs -y
       - run:
           name: Update cloudfront distribution
-          working_directory: ./.circleci/files
           command: |
-             aws cloudformation deploy \
-              --template-file .circleci/files/cloudfront.yml \
-              --tags project=circleci-${CIRCLE_WORKFLOW_ID:0:7} \
-              --stack-name "udapeople-cloudfrontstack" \
-              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}"
+            # your code here 
+            export OldWorkflowID=$(aws cloudformation list-exports \
+            --query "Exports[?Name==\`WorkflowID\`].Value" \
+            --no-paginate --output text)
+            echo $OldWorkflowID >> ~/OldWorkflowID.txt
+            cat ~/OldWorkflowID.txt
+            # Change the initial stack name, as applicable to you
+            aws cloudformation deploy \
+            --template-file .circleci/files/cloudfront.yml \
+            --stack-name InitialStack \
+            --parameter-overrides WorkflowID=${CIRCLE_WORKFLOW_ID:0:7} \
+            --tags project=udapeople
+            echo OldWorkflowID=${OldWorkflowID}
+            echo Current Workflow ID: ${CIRCLE_WORKFLOW_ID:0:7}
+  
       - revert_migrations:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
 
 
   cleanup:
-    executor: aws
+    docker:
+      # Docker image here
+      - image: circleci/node:13.8.0
     steps:
-      - checkout
+      # Checkout code from git
       - run:
           name: Get old stack workflow id
           command: |
+            # your code here
+            export OldWorkflowID="the id here"
+            export STACKS=[] #put the list of stacks here
+      - run:
+          name: Remove old stacks and files
+          command: |
             export STACKS=($(aws cloudformation list-stacks \
                 --query "StackSummaries[*].StackName" \
-                --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
+                --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
             echo Stack names: "${STACKS[@]}"
-            export OldWorkflowID=$(curl --insecure https://kvdb.io/GRkThmKJMbL9eTWpBLPotj/workflowid)
+            export OldWorkflowID=$(curl --insecure https://kvdb.io/${KVDB_BUCKET}/old_workflow_id)
             echo Old Workflow ID: $OldWorkflowID
-      - run:
-          name: Clean up old environment
-          command: |
-            OldWorkflowID=$(curl --insecure https://kvdb.io/GRkThmKJMbL9eTWpBLPotj/workflowid)
-            CurrentWorkflowID=${CIRCLE_WORKFLOW_ID:0:7}
-            if [[ $OldWorkflowID == "" ]]
+            if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
             then
-              echo "No workflow id found"
-            else
-            if [[ "$CurrentWorkflowID" != "$OldWorkflowID" ]]
-            then
-              echo "$OldWorkflowID!=$CurrentWorkflowID => will delete old version"
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
+              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
             fi
-            fi
+
           environment:
             TERM: xterm-256color
-
 
 workflows:
   default:
