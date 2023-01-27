@@ -389,6 +389,7 @@ jobs:
           name: Package Backend
           #working_directory: ./backend
           command: |
+            pwd
             cd backend
             npm install
             npm run build
@@ -467,7 +468,7 @@ jobs:
             yum install -y nodejs
       - run:
           name: Store old WorkflowID in memstash for cleanup phase
-          working_directory: ./.circleci/files
+          #working_directory: ./.circleci/files
           command: |
             WorkflowID=$(aws cloudformation \
             list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
