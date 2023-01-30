@@ -1,0 +1,3 @@
+https://github.com/yuki528/Give-Your-Application-Auto-Deploy-Superpowers
+http://udapeople-a1b68d0.s3-website-us-east-1.amazonaws.com/#/employees
+https://d1yjhalybr6hjj.cloudfront.net
