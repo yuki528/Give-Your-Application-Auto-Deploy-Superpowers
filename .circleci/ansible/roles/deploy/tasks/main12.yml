@@ -7,6 +7,13 @@
         - openssh
         - rsync
       state: present
+  - name: install pm2
+    become: yes
+    npm:
+      name: pm2
+    global: yes
+    state: latest
+    production: yes
       
   - name: "move files to server"
     become: yes
